@@ -64,7 +64,7 @@ def sample_seqs(
         seqs: List[str]
             List of all sequences.
         labels: List[bool]
-            List of positive/negative labels
+            List of positive/negative labels #i.e. classification labels where one is the minority label, and one is the majority
 
     Returns:
         sampled_seqs: List[str]
@@ -72,4 +72,7 @@ def sample_seqs(
         sampled_labels: List[bool]
             List of labels for the sampled sequences
     """
+    labeled_seqs = np.transpose(np.array([seqs,labels],dtype=object)) #combine the two input lists into a single array
+    
+    
     pass
