@@ -73,6 +73,9 @@ def sample_seqs(
             List of labels for the sampled sequences
     """
     labeled_seqs = np.transpose(np.array([seqs,labels],dtype=object)) #combine the two input lists into a single array
+    shuffled_df = np.random.shuffle(labeled_seqs) #shuffle the array
     
+    class1_len = len(seqs[labels]) #number of observations in the first class
+    class2_len = len(labels) - class1_len #number of observations in the second class
     
     pass
