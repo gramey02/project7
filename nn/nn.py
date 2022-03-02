@@ -102,6 +102,7 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
+        
         pass
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
@@ -239,7 +240,8 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
-        pass
+        nl_transform = 1/(1+(1/np.exp(Z))) #sigmoid function, or 1/(1+e^-Z)
+        return nl_transform
 
     def _relu(self, Z: ArrayLike) -> ArrayLike:
         """
@@ -253,7 +255,8 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
-        pass
+        nl_transform = np.maximum(0,Z) #this mimics the ReLu function which is 0 at x<0 and linearly increasing at x>0
+        return nl_transform
 
     def _sigmoid_backprop(self, dA: ArrayLike, Z: ArrayLike):
         """
@@ -333,7 +336,8 @@ class NeuralNetwork:
             loss: float
                 Average loss of mini-batch.
         """
-        pass
+        loss = np.mean(np.square(y-y_hat))
+        return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
