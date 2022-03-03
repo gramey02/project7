@@ -16,8 +16,8 @@ class NeuralNetwork:
         nn_arch: List[Dict[str, float]]
             This list of dictionaries describes the fully connected layers of the artificial neural network.
             e.g. [{'input_dim': 64, 'output_dim': 32, 'activation': 'relu'}, {'input_dim': 32, 'output_dim': 8, 'activation:': 'sigmoid'}] will generate a
-            2 layer deep fully connected network with an input dimension of 64, a 32 dimension hidden layer
-            and an 8 dimensional output.
+            2 layer deep fully connected network with an input dimension of 64, a 32-dimension hidden layer
+            and an 8-dimensional output.
         lr: float
             Learning Rate (alpha).
         seed: int
@@ -102,8 +102,13 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
+        Z_curr = np.dot(np.transpose(W_curr),A_prev) + b_curr
+        if activation == "relu":
+            A_curr = self._relu(Z_curr) #call relu activation function
+        elif activation == "sigmoid":
+            A_curr = self._sigmoid(Z_curr) #call sigmoid activation function
         
-        pass
+        return (A_curr, Z_curr)
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
         """
@@ -119,6 +124,9 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]:
                 Dictionary storing Z and A matrices from `_single_forward` for use in backprop.
         """
+        #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
+        for layer in 
+        output = 
         pass
 
     def _single_backprop(self,
