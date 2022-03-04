@@ -124,21 +124,28 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]:
                 Dictionary storing Z and A matrices from `_single_forward` for use in backprop.
         """
+        cache = {} #cache to be filled later
         A_prev = X #assign inputs to the previous A matrix
         #for each layer of the nn and each ???individual???, you want to do forward prop
         
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
         #length of nn_arch = # of layers
-        for layer_idx in range(0,len(self.arch)):
-            curr_layer = self.arch[layer_idx] #get dictionary that represents current layer
-            curr_activation = curr_layer['activation'] #get activation type for the current layer
+        for layer_idx in range(1,len(self.arch)+1):
+            curr_layer = self.arch[layer_idx] #get dictionary that represents current layer inputs and outputs
+            curr_activation = curr_layer['activation'] #get activation function type for the current layer
             param_dict = self._param_dict #get current parameters
             
-            W_curr = 2 #get current weights (which on first pass will be randomly initialized)
-            A,Z = self._single_forward(W_curr, b_curr, A_prev, curr_activation)
-            cache[layer_idx] = (A,Z) #store Z and A matrices in cache dictionary
+            W_curr = param_dict['W' + str(layer_idx)] #get current weights (which on first pass will be randomly initialized)
+            b_curr = param_dict['b' + str(layer_idx)] #get current bias terms
             
-        output = 2
+            A_curr,Z_curr = self._single_forward(W_curr, b_curr, A_prev, curr_activation)
+            cache[layer_idx] = (A_curr,Z_curr) #store Z and A matrices in cache dictionary
+            
+            #update variables for next iteration
+            A_prev = A_curr
+            
+        #output should be final A values of corresponding to output layer
+        output = 1#should this be the current A and Z or a dictionary detailing each A and Z?
         return output,cache
 
     def _single_backprop(self,
@@ -173,6 +180,9 @@ class NeuralNetwork:
             db_curr: ArrayLike
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
+        #dJ/dWL = gradient
+        
+        
         pass
 
     def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
@@ -292,7 +302,9 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
-        pass
+        A = self._sigmoid(Z)
+        dZ = dA * A * (1-A) #should this actually be np.multiply? or dot product?
+        return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
         """
@@ -308,6 +320,10 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
+        A = self._relu(Z)
+        A[A<=0] = 0 #anything less than or equal to zero has a gradient of zero
+        A[A>0] = 1 #anything greater than zero has a gradient of 1
+        dZ = A
         pass
 
     def _binary_cross_entropy(self, y: ArrayLike, y_hat: ArrayLike) -> float:
@@ -324,7 +340,8 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
-        pass
+        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
+        return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
