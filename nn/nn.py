@@ -124,10 +124,22 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]:
                 Dictionary storing Z and A matrices from `_single_forward` for use in backprop.
         """
+        A_prev = X #assign inputs to the previous A matrix
+        #for each layer of the nn and each ???individual???, you want to do forward prop
+        
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
-        for layer in 
-        output = 
-        pass
+        #length of nn_arch = # of layers
+        for layer_idx in range(0,len(self.arch)):
+            curr_layer = self.arch[layer_idx] #get dictionary that represents current layer
+            curr_activation = curr_layer['activation'] #get activation type for the current layer
+            param_dict = self._param_dict #get current parameters
+            
+            W_curr = 2 #get current weights (which on first pass will be randomly initialized)
+            A,Z = self._single_forward(W_curr, b_curr, A_prev, curr_activation)
+            cache[layer_idx] = (A,Z) #store Z and A matrices in cache dictionary
+            
+        output = 2
+        return output,cache
 
     def _single_backprop(self,
                          W_curr: ArrayLike,
