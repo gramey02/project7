@@ -34,7 +34,7 @@ class NeuralNetwork:
             This list of dictionaries describing the fully connected layers of the artificial neural network.
     """
     def __init__(self,
-                 nn_arch: List[Dict[str, Union(int, str)]],
+                 nn_arch, #List[Dict[str, Union(int, str)]],
                  lr: float,
                  seed: int,
                  batch_size: int,
@@ -102,7 +102,9 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
-        Z_curr = np.dot(np.transpose(W_curr),A_prev) + b_curr
+        #based on how they are initialized, the weights are already in their de facto "transposed form"
+        Z_curr = np.dot(W_curr,A_prev) + b_curr
+        
         if activation == "relu":
             A_curr = self._relu(Z_curr) #call relu activation function
         elif activation == "sigmoid":
@@ -131,6 +133,7 @@ class NeuralNetwork:
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
         #length of nn_arch = # of layers
         for layer_idx in range(1,len(self.arch)+1):
+            
             curr_layer = self.arch[layer_idx] #get dictionary that represents current layer inputs and outputs
             curr_activation = curr_layer['activation'] #get activation function type for the current layer
             param_dict = self._param_dict #get current parameters
@@ -139,13 +142,16 @@ class NeuralNetwork:
             b_curr = param_dict['b' + str(layer_idx)] #get current bias terms
             
             A_curr,Z_curr = self._single_forward(W_curr, b_curr, A_prev, curr_activation)
-            cache[layer_idx] = (A_curr,Z_curr) #store Z and A matrices in cache dictionary
+            
+            cache["A"+str(layer_idx)] = A_curr #store current A matrix in cache dictionary
+            cache["Z"+str(layer_idx)] = Z_curr #store current Z matrix in cache dictionary
+            
             
             #update variables for next iteration
             A_prev = A_curr
             
-        #output should be final A values of corresponding to output layer
-        output = 1#should this be the current A and Z or a dictionary detailing each A and Z?
+        output = A_curr #output should be final A values of corresponding to output layer
+        
         return output,cache
 
     def _single_backprop(self,
