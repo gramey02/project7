@@ -463,6 +463,8 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
+        m = len(y)
+        dA = -2*np.mean(y-y_hat)
         return dA
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
