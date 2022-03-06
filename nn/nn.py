@@ -128,7 +128,6 @@ class NeuralNetwork:
         """
         cache = {} #cache to be filled later
         A_prev = X #assign inputs to the previous A matrix
-        #for each layer of the nn and each ???individual???, you want to do forward prop
         
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
         #length of nn_arch = # of layers
@@ -187,9 +186,19 @@ class NeuralNetwork:
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
         #dJ/dWL = gradient
+        d = A_prev.shape[1] #get shape of A matrix, the number of dimensions
+        
+        if activation=="sigmoid":
+            dZ_curr = self._sigmoid_backprop(dA_curr, Z_curr)
+        elif activation=="relu":
+            dZ_curr = self._relu_backprop(dA_curr, Z_curr)
         
         
-        pass
+        dW_curr = np.dot(dZ_curr, A_prev.T) / d
+        db_curr = np.sum(dZ_curr, axis=1, keepdims=True) / d
+        dA_prev = np.dot(W_curr.T, dZ_curr)
+        
+        return dA_prev, dW_curr, db_curr
 
     def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
         """
@@ -199,7 +208,7 @@ class NeuralNetwork:
             y (array-like):
                 Ground truth labels.
             y_hat: ArrayLike
-                Predicted output values.
+                Predicted output values. #from the forward prop iteration
             cache: Dict[str, ArrayLike]
                 Dictionary containing the information about the
                 most recent forward pass, specifically A and Z matrices.
@@ -208,6 +217,12 @@ class NeuralNetwork:
             grad_dict: Dict[str, ArrayLike]
                 Dictionary containing the gradient information from this pass of backprop.
         """
+        grad_dict = {} #initialize an empty grad_dict, to be filled with backprop gradients
+        
+        #reverse the nn architecture for backprop and iterate through each layer
+        for layer_idx,layer in reversed(list(enumerate(self.arch))):
+            #get current activation function
+        
         pass
 
     def _update_params(self, grad_dict: Dict[str, ArrayLike]):
@@ -335,11 +350,7 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
-        A = self._relu(Z)
-        A[A<=0] = 0 #anything less than or equal to zero has a gradient of zero
-        A[A>0] = 1 #anything greater than zero has a gradient of 1
-        dZ = A
-        pass
+        return Z>0 #will return True if Z>0
 
     def _binary_cross_entropy(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
