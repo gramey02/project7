@@ -222,7 +222,16 @@ class NeuralNetwork:
         Returns:
             None
         """
-        pass
+        # W = W - alpha*dW
+        # b = b - alpha*db
+        for idx, layer in enumerate(self.arch):
+            layer_idx = idx + 1
+            # updating weight params
+            self._param_dict['W' + str(layer_idx)] -= self._lr * grad_dict['dW' + str(layer_idx)]
+            #updating bias params
+            self._param_dict['b' + str(layer_idx)] -= self._lr * grad_dict['db' + str(layer_idx)]
+            
+        return None
 
     def fit(self,
             X_train: ArrayLike,
