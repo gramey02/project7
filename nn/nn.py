@@ -272,7 +272,41 @@ class NeuralNetwork:
             per_epoch_loss_val: List[float]
                 List of per epoch loss for validation set.
         """
-        pass
+        #initializing empty lists and starting values
+        per_epoch_loss_train = []
+        per_epoch_loss_val = []
+        iteration = 1
+        
+        
+        while iteration<self._epochs:
+            # Shuffling the training data for each epoch of training
+            shuffle_arr = np.concatenate([X_train, np.expand_dims(y_train, 1)], axis=1)
+            # In place shuffle
+            np.random.shuffle(shuffle_arr)
+            X_train = shuffle_arr[:, :-1]
+            y_train = shuffle_arr[:, -1].flatten()
+            num_batches = int(X_train.shape[0]/self._batch_size) + 1
+            X_batch = np.array_split(X_train, num_batches)
+            y_batch = np.array_split(y_train, num_batches)
+            
+            current_params = self._param_dict #get current parameter values
+            
+            y_hat, cache = self.forward(X_train) #forward pass through the network
+            
+            #calculate loss
+            if self._loss_func=="mean squared error":
+                loss = self._mean_squared_error()
+            if self._loss_func=="binary cross entropy":
+                loss = self._mean_squared_error(y_train, y_hat)
+            per_epoch_loss_train.append(loss) #append the current training loss
+            
+            
+                
+            #update values for next iteration
+            iteration+=1
+            
+        
+        return per_epoch_loss_tran, per_epoch_loss_val
 
     def predict(self, X: ArrayLike) -> ArrayLike:
         """
@@ -333,7 +367,7 @@ class NeuralNetwork:
                 Partial derivative of current layer Z matrix.
         """
         A = self._sigmoid(Z)
-        dZ = dA * A * (1-A) #should this actually be np.multiply? or dot product?
+        dZ = A * (1-A) #dA * A * (1-A) #should this actually be np.multiply? or dot product?
         return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
