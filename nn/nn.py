@@ -224,21 +224,21 @@ class NeuralNetwork:
             curr_layer = last_layer+1
             param_dict = self._param_dict
             
-            curr_activaton = layer['activation'] #get activation function of the current layer
-            
             #get the inputs necessary for _single_backprop method
-            A_prev = cache["A"+str(last_layer)]
-            Z_curr = cache["Z"+str(curr_layer)]
-            W_curr = param_dict["W"+str(curr_layer)]
-            b_curr = param_dict["b"+str(curr_layer)]
+            curr_activaton = layer['activation'] #activation function of the current layer
+            A_prev = cache["A"+str(last_layer)] #inputs of the previous layer
+            Z_curr = cache["Z"+str(curr_layer)] #transformed inputs of the current layer
+            W_curr = param_dict["W"+str(curr_layer)] #weights of the current layer
+            b_curr = param_dict["b"+str(curr_layer)] #bias terms of the current layer
             
+            #single backprop through current layer
+            dA_prev, dW_curr, db_curr = self._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, curr_activation)
             
-            #for single backprop inputs you need W_curr, b_curr, Z_curr, A_prev, dA_curr, activation_curr
-            dA_prev, dW_curr, db_curr = self._single_backprop()
-            
-            #add to grad_dict
+            #update grad_dict
+            grad_dict['dW' + str(curr_layer)] = dW_curr
+            grad_dict['db' + str(curr_layer)] = db_curr
         
-        pass
+        return grad_dict
 
     def _update_params(self, grad_dict: Dict[str, ArrayLike]):
         """
@@ -430,7 +430,7 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
-        pass
+        return dA
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
@@ -463,7 +463,7 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
-        pass
+        return dA
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
