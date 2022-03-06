@@ -219,10 +219,18 @@ class NeuralNetwork:
         """
         grad_dict = {} #initialize an empty grad_dict, to be filled with backprop gradients
         
+        #get dA_prev
+        if self._loss_func=="mean squared error":
+            dA_prev = self._mean_squared_error_backprop(y, y_hat)
+        if self._loss_func=="binary cross entropy":
+            dA_prev = self._binary_cross_entropy_backprop(y, y_hat)
+        
         #reverse the nn architecture for backprop and iterate through each layer
         for last_layer,layer in reversed(list(enumerate(self.arch))):
             curr_layer = last_layer+1
             param_dict = self._param_dict
+            
+            dA_curr = dA_prev
             
             #get the inputs necessary for _single_backprop method
             curr_activaton = layer['activation'] #activation function of the current layer
