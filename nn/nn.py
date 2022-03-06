@@ -430,7 +430,7 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
-        return dA
+        return -np.mean((y/y_hat) + ((1-y)/(1-y_hat)))
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
@@ -482,7 +482,8 @@ class NeuralNetwork:
             loss: float
                 Average loss of mini-batch.
         """
-        pass
+        
+        return dA
 
     def _loss_function_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
