@@ -220,8 +220,23 @@ class NeuralNetwork:
         grad_dict = {} #initialize an empty grad_dict, to be filled with backprop gradients
         
         #reverse the nn architecture for backprop and iterate through each layer
-        for layer_idx,layer in reversed(list(enumerate(self.arch))):
-            #get current activation function
+        for last_layer,layer in reversed(list(enumerate(self.arch))):
+            curr_layer = last_layer+1
+            param_dict = self._param_dict
+            
+            curr_activaton = layer['activation'] #get activation function of the current layer
+            
+            #get the inputs necessary for _single_backprop method
+            A_prev = cache["A"+str(last_layer)]
+            Z_curr = cache["Z"+str(curr_layer)]
+            W_curr = param_dict["W"+str(curr_layer)]
+            b_curr = param_dict["b"+str(curr_layer)]
+            
+            
+            #for single backprop inputs you need W_curr, b_curr, Z_curr, A_prev, dA_curr, activation_curr
+            dA_prev, dW_curr, db_curr = self._single_backprop()
+            
+            #add to grad_dict
         
         pass
 
@@ -289,8 +304,6 @@ class NeuralNetwork:
             X_batch = np.array_split(X_train, num_batches)
             y_batch = np.array_split(y_train, num_batches)
             
-            current_params = self._param_dict #get current parameter values
-            
             y_hat, cache = self.forward(X_train) #forward pass through the network
             
             #calculate loss
@@ -300,10 +313,10 @@ class NeuralNetwork:
                 loss = self._mean_squared_error(y_train, y_hat)
             per_epoch_loss_train.append(loss) #append the current training loss
             
-            
+            grad_dict = self.backprop(y_train, y_hat, cache) #backpropagation pass through the network
                 
-            #update values for next iteration
-            iteration+=1
+            iteration+=1 #update iteration
+            self._param_dict = self._update_params(grad_dict) #update parameter values
             
         
         return per_epoch_loss_tran, per_epoch_loss_val
