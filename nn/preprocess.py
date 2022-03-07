@@ -53,9 +53,7 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
     return encodings
 
 
-def sample_seqs(
-        seqs: List[str]
-        labels: List[bool]) -> Tuple[List[seq], List[bool]]:
+def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[bool]]:
     """
     This function should sample your sequences to account for class imbalance. 
     Consider this as a sampling scheme with replacement.
@@ -99,11 +97,15 @@ def sample_seqs(
         sampled_labels = [True for i in range(len(oversample_class1))] + [False for i in range(len(class0))]
     
     #if class1 has many more observations than class 0, oversample the sequences in class 0
-    if num_class1>num_class0:
+    elif num_class1>num_class0:
         #sample class0 with replacement
         oversample_class0 = np.random.choice(np.array(class0), size=num_class1, replace=True)
         #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
         sampled_seqs = oversample_class0 + class1
         sampled_labels = [False for i in range(len(oversample_class0))] + [True for i in range(len(class1))]
+        
+    elif num_class0==num_class1:
+        sampled_seqs = seqs
+        sampled_labels = labels
     
     return sampled_seqs, sampled_labels
