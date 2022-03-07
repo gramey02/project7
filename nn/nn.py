@@ -309,23 +309,34 @@ class NeuralNetwork:
             y_train = shuffle_arr[:, -1].flatten() #separate out the outputs
             #divide number of observations by the batch size to get number of batches
             num_batches = int(X_train.shape[0]/self._batch_size) + 1
+            #split the X and y data into their respective number of batches
             X_batch = np.array_split(X_train, num_batches)
             y_batch = np.array_split(y_train, num_batches)
             
-            y_hat, cache = self.forward(X_train) #forward pass through the network
-            
-            #calculate loss
-            if self._loss_func=="mean squared error":
-                loss = self._mean_squared_error(y_train, y_hat)
-            elif self._loss_func=="binary cross entropy":
-                loss = self._binary_cross_entropy(y_train, y_hat)
+            for X_train, y_train in zip(X_batch, y_batch):
+                #forward pass through the network
+                y_hat, cache = self.forward(X_train)
+                #calculate loss
+                if self._loss_func=="mean squared error":
+                    loss = self._mean_squared_error(y_train, y_hat)
+                elif self._loss_func=="binary cross entropy":
+                    loss = self._binary_cross_entropy(y_train, y_hat)
+                per_epoch_loss_train.append(loss) #append the current training loss
+                #backpropagation pass through the network
+                grad_dict = self.backprop(y_train, y_hat, cache)
+                #update parameter values
+                self._param_dict = self._update_params(grad_dict) #update parameter values
                 
-            per_epoch_loss_train.append(loss) #append the current training loss
-            
-            grad_dict = self.backprop(y_train, y_hat, cache) #backpropagation pass through the network
-                
-            iteration+=1 #update iteration
-            self._param_dict = self._update_params(grad_dict) #update parameter values
+                #validation pass
+                y_pred, val_cache = self.forward(X_val) #make prediction based on current weights
+                #calculate loss
+                if self._loss_func=="mean squared error":
+                    val_loss = self._mean_squared_error(y_val, y_pred)
+                elif self._loss_func=="binary cross entropy":
+                    val_loss = self._binary_cross_entropy(y_val, y_pred)
+                per_epoch_loss_val.append(val_loss) #append the current validation loss
+                    
+            iteration+=1 #update iteration number
             
         
         return per_epoch_loss_tran, per_epoch_loss_val
@@ -342,7 +353,9 @@ class NeuralNetwork:
             y_hat: ArrayLike
                 Prediction from the model.
         """
-        pass
+        y_hat, cache = self.forward(X)
+        
+        return y_hat
 
     def _sigmoid(self, Z: ArrayLike) -> ArrayLike:
         """
