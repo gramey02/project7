@@ -72,10 +72,34 @@ def sample_seqs(
         sampled_labels: List[bool]
             List of labels for the sampled sequences
     """
-    labeled_seqs = np.transpose(np.array([seqs,labels],dtype=object)) #combine the two input lists into a single array
-    shuffled_df = np.random.shuffle(labeled_seqs) #shuffle the array
+    #get list of indices where labels = False
+    indices_0 = [i for i in range(len(seqs)) if labels[x]==False]
+    #get list of indices where labels = True
+    indices_1 = [i for i in range(len(seqs)) if labels[x]==True]
     
-    class1_len = len(seqs[labels]) #number of observations in the first class
-    class2_len = len(labels) - class1_len #number of observations in the second class
+    num_class0 = len(indices_0) #get the number of labels in class 0
+    num_class1 = len(seqs) - num_class0 #get the number of labels in class 1
+    
+    class0 = []
+    class1 = []
+    
+    #get all the observations that belong to class 0
+    for i in range(len(seqs)):
+        if labels[i]==False:
+            class0.append(seqs[i])
+        else:
+            class1.append(seqs[i])
+    
+    #if class0 has many more observations than class 1, oversample the sequences in class 1
+    if num_class0>num_class1:
+        #sample class1 seqs with replacement
+        oversample_class1 = np.random.choice(np.array(class1), size=num_class0, replace=True)
+        #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
+        final_seqs = 
+    
+    #if class1 has many more observations than class 0, oversample the sequences in class 0
+    if num_class1>num_class0:
+        #sample class0 with replacement
+        oversample_class0 = np.random.choice(np.array(class0), size=num_class1, replace=True)
     
     pass
