@@ -300,14 +300,14 @@ class NeuralNetwork:
         per_epoch_loss_val = []
         iteration = 1
         
-        
-        while iteration<self._epochs:
-            # Shuffling the training data for each epoch of training
+        while iteration < self._epochs:
+            # Add y_values as the last column vector in X_train
             shuffle_arr = np.concatenate([X_train, np.expand_dims(y_train, 1)], axis=1)
             # In place shuffle
             np.random.shuffle(shuffle_arr)
-            X_train = shuffle_arr[:, :-1]
-            y_train = shuffle_arr[:, -1].flatten()
+            X_train = shuffle_arr[:, :-1] #separate out the inputs
+            y_train = shuffle_arr[:, -1].flatten() #separate out the outputs
+            #divide number of observations by the batch size to get number of batches
             num_batches = int(X_train.shape[0]/self._batch_size) + 1
             X_batch = np.array_split(X_train, num_batches)
             y_batch = np.array_split(y_train, num_batches)
@@ -316,9 +316,10 @@ class NeuralNetwork:
             
             #calculate loss
             if self._loss_func=="mean squared error":
-                loss = self._mean_squared_error()
-            if self._loss_func=="binary cross entropy":
                 loss = self._mean_squared_error(y_train, y_hat)
+            elif self._loss_func=="binary cross entropy":
+                loss = self._binary_cross_entropy(y_train, y_hat)
+                
             per_epoch_loss_train.append(loss) #append the current training loss
             
             grad_dict = self.backprop(y_train, y_hat, cache) #backpropagation pass through the network
