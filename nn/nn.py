@@ -353,7 +353,7 @@ class NeuralNetwork:
             y_hat: ArrayLike
                 Prediction from the model.
         """
-        y_hat, cache = self.forward(X)
+        y_hat, cache = self.forward(X) #run forward pass on the data to get outputs
         
         return y_hat
 
