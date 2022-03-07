@@ -95,11 +95,15 @@ def sample_seqs(
         #sample class1 seqs with replacement
         oversample_class1 = np.random.choice(np.array(class1), size=num_class0, replace=True)
         #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
-        final_seqs = 
+        sampled_seqs = oversample_class1 + class0
+        sampled_labels = [True for i in range(len(oversample_class1))] + [False for i in range(len(class0))]
     
     #if class1 has many more observations than class 0, oversample the sequences in class 0
     if num_class1>num_class0:
         #sample class0 with replacement
         oversample_class0 = np.random.choice(np.array(class0), size=num_class1, replace=True)
+        #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
+        sampled_seqs = oversample_class0 + class1
+        sampled_labels = [False for i in range(len(oversample_class0))] + [True for i in range(len(class1))]
     
-    pass
+    return sampled_seqs, sampled_labels
