@@ -42,4 +42,7 @@ def test_one_hot_encode():
 
 
 def test_sample_seqs():
+    #use list.count to see if the output labels vector of sample_seqs has equal numbers of true and false
+    new_labels.count(True)
+    new_labels.count(False)
     pass
