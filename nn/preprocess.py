@@ -71,15 +71,17 @@ def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[boo
             List of labels for the sampled sequences
     """
     #get list of indices where labels = False
-    indices_0 = [i for i in range(len(seqs)) if labels[x]==False]
+    indices_0 = [i for i in range(len(seqs)) if labels[i]==False]
     #get list of indices where labels = True
-    indices_1 = [i for i in range(len(seqs)) if labels[x]==True]
+    indices_1 = [i for i in range(len(seqs)) if labels[i]==True]
     
     num_class0 = len(indices_0) #get the number of labels in class 0
     num_class1 = len(seqs) - num_class0 #get the number of labels in class 1
     
     class0 = []
     class1 = []
+    oversample_class1 = []
+    oversample_class0 = []
     
     #get all the observations that belong to class 0
     for i in range(len(seqs)):
@@ -93,7 +95,7 @@ def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[boo
         #sample class1 seqs with replacement
         oversample_class1 = np.random.choice(np.array(class1), size=num_class0, replace=True)
         #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
-        sampled_seqs = oversample_class1 + class0
+        sampled_seqs = list(oversample_class1) + class0
         sampled_labels = [True for i in range(len(oversample_class1))] + [False for i in range(len(class0))]
     
     #if class1 has many more observations than class 0, oversample the sequences in class 0
@@ -101,7 +103,7 @@ def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[boo
         #sample class0 with replacement
         oversample_class0 = np.random.choice(np.array(class0), size=num_class1, replace=True)
         #join the oversampled seq list and the other class seq list to get a final balanced list of seqs
-        sampled_seqs = oversample_class0 + class1
+        sampled_seqs = list(oversample_class0) + class1
         sampled_labels = [False for i in range(len(oversample_class0))] + [True for i in range(len(class1))]
         
     elif num_class0==num_class1:
