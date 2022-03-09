@@ -38,6 +38,8 @@ def test_mean_squared_error_backprop():
 
 
 def test_one_hot_encode():
+    #is an encoded sequence 4x as long as the original input sequence?
+    #are the 1s and 0s in the proper place?
     pass
 
 
