@@ -103,7 +103,7 @@ class NeuralNetwork:
                 Current layer linear transformed matrix.
         """
         #based on how they are initialized, the weights are already in their de facto "transposed form"
-        Z_curr = np.dot(W_curr,A_prev) + b_curr
+        Z_curr = np.matmul(W_curr,A_prev) + b_curr
         
         if activation == "relu":
             A_curr = self._relu(Z_curr) #call relu activation function
