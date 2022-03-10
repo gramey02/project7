@@ -71,11 +71,17 @@ def test_single_forward():
     #check if A1 and Z1 are calculated correctly based on the output of _single_forward
     A1,Z1 = nn._single_forward(W1, b1, dummy, activation)
     
-    expectedA1 = np.array() #insert expected A1 and Z1
-    expectedZ1 = np.array()
+    expectedA1 = np.array([[0.17993984, 0.4461183 , 0.        ],
+                           [0.25162981, 0.88026198, 0.        ],
+                           [0.32331978, 1.31440566, 0.        ],
+                           [0.39500975, 1.74854933, 0.        ]])
+    expectedZ1 = np.array([[ 0.17993984,  0.4461183 , -0.11719017],
+                           [ 0.25162981,  0.88026198, -0.21084823],
+                           [ 0.32331978,  1.31440566, -0.3045063 ],
+                           [ 0.39500975,  1.74854933, -0.39816437]])
     
     comparison1 = expectedA1==A1
-    comparison2 = expectedA2==A2
+    comparison2 = expectedZ1==Z1
     
     arrays_are_equal1 = comparison1.all()
     arrays_are_equal2 = comparison2.all()
