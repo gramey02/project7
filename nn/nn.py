@@ -102,25 +102,12 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
-        #based on how things are initialized we actually need to transpose A_prev, not W_curr
-        #print("A_prev: ")
-        #print(A_prev)
-        #print("W_curr: ")
-        #print(W_curr)
+        #based on how things are initialized, we actually need to transpose A_prev, not W_curr
         
         A_prevT = np.transpose(A_prev)
         
-        #print("W_curr shape: ")
-        #print(W_curr.shape)
-        #print("A_prevT shape: ")
-        #print(A_prevT.shape)
-        
         Z_curr_noT = np.matmul(W_curr, A_prevT) + b_curr
         Z_curr = np.transpose(Z_curr_noT) #dimensions = n_observations x # output neurons
-        
-        #print("Z_curr: ")
-        #print(Z_curr)
-        
         
         if activation == "relu":
             A_curr = self._relu(Z_curr) #call relu activation function
@@ -150,7 +137,6 @@ class NeuralNetwork:
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
         #length of nn_arch = # of layers
         for idx, layer in enumerate(self.arch):
-            #print(layer_idx)
             layer_idx = idx+1
             
             curr_activation = layer['activation'] #get activation function type for the current layer
@@ -204,26 +190,16 @@ class NeuralNetwork:
             db_curr: ArrayLike
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
-        #dJ/dWL = gradient
-        d = A_prev.shape[1] #get shape of A matrix, the number of dimensions
+        m = A_prev.shape[0] #get the number of examples
         
         if activation_curr=="sigmoid":
             dZ_curr = self._sigmoid_backprop(dA_curr, Z_curr)
         elif activation_curr=="relu":
-            dZ_curr = (self._relu_backprop(dA_curr, Z_curr)).astype(float)
-            
-#         print("dZ_curr: ")
-#         print(dZ_curr)
-#         print("dZ_curr shape: ", dZ_curr.shape)
+            dZ_curr = (self._relu_backprop(dA_curr, Z_curr)).astype(float)        
         
-        
-        dW_curr = np.dot(dZ_curr.T, A_prev) / d
-        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True)) / d
+        dW_curr = np.dot(dZ_curr.T, A_prev) / m
+        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True)) / m
         dA_prev = np.dot(dZ_curr, W_curr)
-        
-#         print("db_curr: ")
-#         print(db_curr)
-#         print("db_curr shape: ", db_curr.shape)
         
         return dA_prev, dW_curr, db_curr
 
@@ -258,25 +234,13 @@ class NeuralNetwork:
             param_dict = self._param_dict
             
             dA_curr = dA_prev
-            #print("dA_curr: ")
-            #print(dA_curr)
             
             #get the inputs necessary for _single_backprop method
             curr_activation = layer["activation"] #activation function of the current layer
-            #print("curr_activation: ")
-            #print(curr_activation)
             A_prev = cache["A"+str(last_layer)] #inputs of the previous layer
-            #print("A_prev: ")
-            #print(A_prev)
             Z_curr = cache["Z"+str(curr_layer)] #transformed inputs of the current layer
-            #print("Z_curr: ")
-            #print(Z_curr)
             W_curr = param_dict["W"+str(curr_layer)] #weights of the current layer
-            #print("W_curr: ")
-            #print(W_curr)
             b_curr = param_dict["b"+str(curr_layer)] #bias terms of the current layer
-            #print("b_curr: ")
-            #print(b_curr)
             
             #single backprop through current layer
             dA_prev, dW_curr, db_curr = self._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, curr_activation)
@@ -304,31 +268,10 @@ class NeuralNetwork:
         for idx, layer in enumerate(self.arch):
             layer_idx = idx + 1
             
-#            print(self._lr)
-            
-#             print('dW' + str(layer_idx) + ': ')
-#             print(grad_dict['dW' + str(layer_idx)])
-#             print('dW shape: ', (grad_dict['dW' + str(layer_idx)]).shape)
-            
-#             print('W' + str(layer_idx) + ': ')
-#             print(self._param_dict['W' + str(layer_idx)])
-#             print('W shape: ', (self._param_dict['W' + str(layer_idx)]).shape)
-            
-#             print('db' + str(layer_idx) + ': ')
-#             print(grad_dict['db' + str(layer_idx)])
-#             print('db shape: ', (grad_dict['db' + str(layer_idx)]).shape)
-            
-#             print('b' + str(layer_idx) + ': ')
-#             print(self._param_dict['b' + str(layer_idx)])
-#             print('b shape: ', (self._param_dict['b' + str(layer_idx)]).shape)
-            
             # updating weight params
             self._param_dict['W' + str(layer_idx)] -= self._lr * grad_dict['dW' + str(layer_idx)]
             #updating bias params
             self._param_dict['b' + str(layer_idx)] -= self._lr * grad_dict['db' + str(layer_idx)]
-            
-            
-            
             
         return None
 
@@ -363,7 +306,6 @@ class NeuralNetwork:
         
         while iteration < self._epochs:
             #!!don't forget to expand the dimensions of the y_vectors prior to inputting them into the fit function!!
-            #print("iteration: " + str(iteration))
             #get number of dimensions in the X_train and y_train datasets
             dim_X_train = X_train.shape[1]
             dim_y_train = y_train.shape[1]
