@@ -197,8 +197,8 @@ class NeuralNetwork:
         elif activation_curr=="relu":
             dZ_curr = (self._relu_backprop(dA_curr, Z_curr)).astype(float)        
         
-        dW_curr = np.dot(dZ_curr.T, A_prev) / m
-        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True)) / m
+        dW_curr = np.dot(dZ_curr.T, A_prev) #/ m
+        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True)) #/ m
         dA_prev = np.dot(dZ_curr, W_curr)
         
         return dA_prev, dW_curr, db_curr
@@ -322,6 +322,10 @@ class NeuralNetwork:
             X_batch = np.array_split(X_train, num_batches)
             y_batch = np.array_split(y_train, num_batches)
             
+            #keep track of the per batch loss so you can take the mean at the end
+            per_batch_train_loss = []
+            per_batch_val_loss = []
+            
             for X_train, y_train in zip(X_batch, y_batch):
                 #forward pass through the network
                 y_hat, cache = self.forward(X_train)
@@ -330,7 +334,7 @@ class NeuralNetwork:
                     loss = self._mean_squared_error(y_train, y_hat)
                 elif self._loss_func=="binary cross entropy":
                     loss = self._binary_cross_entropy(y_train, y_hat)
-                per_epoch_loss_train.append(loss) #append the current training loss
+                per_batch_train_loss.append(loss) #append the current training loss
                 
                 #backpropagation pass through the network
                 grad_dict = self.backprop(y_train, y_hat, cache)
@@ -344,9 +348,11 @@ class NeuralNetwork:
                     val_loss = self._mean_squared_error(y_val, y_pred)
                 elif self._loss_func=="binary cross entropy":
                     val_loss = self._binary_cross_entropy(y_val, y_pred)
-                per_epoch_loss_val.append(val_loss) #append the current validation loss
+                per_batch_val_loss.append(val_loss) #append the current validation loss
                     
             iteration+=1 #update iteration number
+            per_epoch_loss_train.append(np.mean(per_batch_train_loss)) #append epoch's mean training loss
+            per_epoch_loss_val.append(np.mean(per_batch_val_loss)) #append epoch's mean validation loss
             
         
         return per_epoch_loss_train, per_epoch_loss_val
@@ -413,7 +419,7 @@ class NeuralNetwork:
                 Partial derivative of current layer Z matrix.
         """
         A = self._sigmoid(Z)
-        dZ = A * (1-A) #should this actually be np.multiply? or dot product?
+        dZ = np.multiply(A,(1-A)) #should this actually be np.multiply? or dot product?
         return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
@@ -446,7 +452,7 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
-        #flatten input vectors
+        #flatten input vectors, because they should be 1-dimensional
         y = y.flatten()
         y_hat = y_hat.flatten()
         
