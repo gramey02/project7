@@ -48,7 +48,7 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
 
         flattened_seq = seq_encoded.flatten() #flatten the sequence's encodings into a single array entry
         #convert the flattened seq to a list
-        encodings[seq_counter] = list(flattened_seq) #add the sequence's encoded list to the encodings container array
+        encodings[seq_counter] = flattened_seq #add the sequence's encoded list to the encodings container array
         #increment sequence counter
         seq_counter+=1
     
