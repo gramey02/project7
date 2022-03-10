@@ -6,10 +6,14 @@
 # TODO: Write your test functions and associated docstrings below.
 
 def test_forward():
+    #ensure that dimensions are correct, that the cache and output are the appropriate length/dimensions (respectively)
+    #ensure the output equals what you expect (array equal protocol)
     pass
 
 
 def test_single_forward():
+    #check dimensions
+    #check transpositions
     pass
 
 
