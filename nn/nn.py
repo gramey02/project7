@@ -102,8 +102,19 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
-        #based on how they are initialized, the weights are already in their de facto "transposed form"
-        Z_curr = np.matmul(W_curr,A_prev) + b_curr
+        #based on how things are initialized we actually need to transpose A_prev, not W_curr
+        #print("A_prev: ")
+        #print(A_prev)
+        #print("W_curr: ")
+        #print(W_curr)
+        
+        A_prevT = np.transpose(A_prev)
+        Z_curr_noT = np.matmul(W_curr, A_prevT) + b_curr
+        Z_curr = np.transpose(Z_curr_noT) #dimensions = n_observations x # output neurons
+        
+        #print("Z_curr: ")
+        #print(Z_curr)
+        
         
         if activation == "relu":
             A_curr = self._relu(Z_curr) #call relu activation function
@@ -131,10 +142,11 @@ class NeuralNetwork:
         
         #probably want to create a for loop where you loop through each layer of the model and get Z and A matrices for each layer
         #length of nn_arch = # of layers
-        for layer_idx in range(1,len(self.arch)+1):
+        for idx, layer in enumerate(self.arch):
+            #print(layer_idx)
+            layer_idx = idx+1
             
-            curr_layer = self.arch[layer_idx] #get dictionary that represents current layer inputs and outputs
-            curr_activation = curr_layer['activation'] #get activation function type for the current layer
+            curr_activation = layer['activation'] #get activation function type for the current layer
             param_dict = self._param_dict #get current parameters
             
             W_curr = param_dict['W' + str(layer_idx)] #get current weights (which on first pass will be randomly initialized)
@@ -436,6 +448,11 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
+        #flatten input vectors
+        y = y.flatten()
+        y_hat = y_hat.flatten()
+        
+        #calculate loss
         loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
         return loss
 
@@ -454,7 +471,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
         m = len(y)
-        return -(1/m)*((y/y_hat) + ((1-y)/(1-y_hat))) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat)))
+        return -(1/m)*(np.divide(y,y_hat) + np.divide(1-y,1-y_hat)) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat)))
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
@@ -488,7 +505,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
         m = len(y)
-        dA = -2*(1/m)*(y-y_hat) #-2*np.mean(y-y_hat)
+        dA = -2*(1/m)*(y-y_hat)
         return dA
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
@@ -507,7 +524,7 @@ class NeuralNetwork:
                 Average loss of mini-batch.
         """
         
-        return dA
+        pass
 
     def _loss_function_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
