@@ -25,7 +25,10 @@ def test_forward():
     output,cache = nn.forward(dummy)
     
     #insert expected output for the forward pass (prior to training)
-    expected = np.array([])
+    expected = np.array([[0.48322134, 0.45455472],
+                         [0.47916976, 0.43447566],
+                         [0.47512091, 0.41460935],
+                         [0.47107534, 0.39501693]])
     
     comparison = output==expected
     arrays_are_equal = comparison.all() #compares all array values to make sure they are equal at the same indices
@@ -36,11 +39,12 @@ def test_forward():
     assert output.shape[1] == 2
     
     #check that A0,A1,A2,Z1,and Z2 are in the cache (i.e., the cache has been updated)
-    assert 'A0' in cache
-    assert 'A1' in cache
-    assert 'A2' in cache
-    assert 'Z1' in cache
-    assert 'Z2' in cache
+    assert ('A0' in cache)==True
+    assert ('A1' in cache)==True
+    assert ('A2' in cache)==True
+    assert ('Z1' in cache)==True
+    assert ('Z2' in cache)==True
+    assert ('A5' in cahce)==False
 
 
 def test_single_forward():
