@@ -200,9 +200,9 @@ class NeuralNetwork:
         #dJ/dWL = gradient
         d = A_prev.shape[1] #get shape of A matrix, the number of dimensions
         
-        if activation=="sigmoid":
+        if activation_curr=="sigmoid":
             dZ_curr = self._sigmoid_backprop(dA_curr, Z_curr)
-        elif activation=="relu":
+        elif activation_curr=="relu":
             dZ_curr = self._relu_backprop(dA_curr, Z_curr)
         
         
@@ -245,7 +245,7 @@ class NeuralNetwork:
             dA_curr = dA_prev
             
             #get the inputs necessary for _single_backprop method
-            curr_activaton = layer['activation'] #activation function of the current layer
+            curr_activation = layer["activation"] #activation function of the current layer
             A_prev = cache["A"+str(last_layer)] #inputs of the previous layer
             Z_curr = cache["Z"+str(curr_layer)] #transformed inputs of the current layer
             W_curr = param_dict["W"+str(curr_layer)] #weights of the current layer
@@ -415,7 +415,7 @@ class NeuralNetwork:
                 Partial derivative of current layer Z matrix.
         """
         A = self._sigmoid(Z)
-        dZ = A * (1-A) #dA * A * (1-A) #should this actually be np.multiply? or dot product?
+        dZ = A * (1-A) #should this actually be np.multiply? or dot product?
         return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
