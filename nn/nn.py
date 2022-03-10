@@ -227,6 +227,8 @@ class NeuralNetwork:
             dA_prev = self._mean_squared_error_backprop(y, y_hat)
         if self._loss_func=="binary cross entropy":
             dA_prev = self._binary_cross_entropy_backprop(y, y_hat)
+            
+        #print(dA_prev)
         
         #reverse the nn architecture for backprop and iterate through each layer
         for last_layer,layer in reversed(list(enumerate(self.arch))):
@@ -266,12 +268,21 @@ class NeuralNetwork:
         # W = W - alpha*dW
         # b = b - alpha*db
         for idx, layer in enumerate(self.arch):
-            layer_idx = idx + 1
+            
+            layer_idx = idx+1
+#             print("layer_idx: ", layer_idx)
+#             print("layer: ", layer)
+            
+#             print('W' + str(layer_idx))
+#             print(self._param_dict['W' + str(layer_idx)])
+            
+#             print('b' + str(layer_idx))
+#             print(self._param_dict['b' + str(layer_idx)])
             
             # updating weight params
-            self._param_dict['W' + str(layer_idx)] -= self._lr * grad_dict['dW' + str(layer_idx)]
+            self._param_dict['W' + str(layer_idx)] = self._param_dict['W' + str(layer_idx)] + (self._lr * grad_dict['dW' + str(layer_idx)])
             #updating bias params
-            self._param_dict['b' + str(layer_idx)] -= self._lr * grad_dict['db' + str(layer_idx)]
+            self._param_dict['b' + str(layer_idx)] = self._param_dict['b' + str(layer_idx)] + (self._lr * grad_dict['db' + str(layer_idx)])
             
         return None
 
@@ -335,6 +346,7 @@ class NeuralNetwork:
                 elif self._loss_func=="binary cross entropy":
                     loss = self._binary_cross_entropy(y_train, y_hat)
                 per_batch_train_loss.append(loss) #append the current training loss
+                #per_epoch_loss_train.append(loss)
                 
                 #backpropagation pass through the network
                 grad_dict = self.backprop(y_train, y_hat, cache)
@@ -349,6 +361,7 @@ class NeuralNetwork:
                 elif self._loss_func=="binary cross entropy":
                     val_loss = self._binary_cross_entropy(y_val, y_pred)
                 per_batch_val_loss.append(val_loss) #append the current validation loss
+                #per_epoch_loss_val.append(val_loss)
                     
             iteration+=1 #update iteration number
             per_epoch_loss_train.append(np.mean(per_batch_train_loss)) #append epoch's mean training loss
@@ -457,7 +470,7 @@ class NeuralNetwork:
         y_hat = y_hat.flatten()
         
         #calculate loss
-        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
+        loss = np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat))) #took away negative sign
         return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -509,7 +522,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
         m = len(y)
-        dA = -2*(1/m)*(y-y_hat)
+        dA = 2*(y-y_hat)*(1/m) #took away negative sign
         return dA
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
