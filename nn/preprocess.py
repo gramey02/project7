@@ -30,27 +30,23 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
             Then, AGA -> [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
     """
     #create a dictionary for each letter
-    d = {'A':np.array([1, 0, 0, 0]), 'T':np.array([0, 1, 0, 0]), 'C':np.array([0, 0, 1, 0]), 'G':np.array([0, 0, 0, 1])} 
-    encodings = np.empty((len(seq_arr),), dtype=object) #create an array to be by each sequence's encoded array
-    seq_counter=0
+    d = {'A':[1, 0, 0, 0], 'T':[0, 1, 0, 0], 'C':[0, 0, 1, 0], 'G':[0, 0, 0, 1]} 
+    encodings = [] #list to be filled with the encoding of each sequence
 
     #iterate through list of sequences
     for seq in seq_arr:
-        #create an empty array for each seq to be filled with each seq letter's encoding
-        seq_encoded = np.ones((len(seq),4))
+        #create an empty list for each seq that will be filled with all of the letter encodings
+        seq_encoded = []
 
-        #go letter by letter storing the current letter's 1x4 array in the larger container array, then flatten that array
-        letter_counter = 0
+        #go letter by letter storing the current letter's 1x4 list in the larger container list for the seq
         for letter in seq:
             current_encoding = d[letter] #get the encoding for the current letter
-            seq_encoded[letter_counter] = current_encoding #add current encoding to array
-            letter_counter+=1 #increment the index counter for the next letter
+            #add to existing seq_encoded list with the newest letter's encoding
+            seq_encoded = seq_encoded + current_encoding
 
-        flattened_seq = seq_encoded.flatten() #flatten the sequence's encodings into a single array entry
+        #flattened_seq = seq_encoded.flatten() #flatten the sequence's encodings into a single array entry
         #convert the flattened seq to a list
-        encodings[seq_counter] = flattened_seq #add the sequence's encoded list to the encodings container array
-        #increment sequence counter
-        seq_counter+=1
+        encodings.append(seq_encoded) #append current seq's encoding to larger encodings list
     
     return encodings
 
