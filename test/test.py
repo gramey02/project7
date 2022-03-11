@@ -158,7 +158,9 @@ def test_one_hot_encode():
 
 
 def test_sample_seqs():
+    
     #test that after balancing, the labels vector should have the same number of trues and falses
+    #check that the length of the resulting lists is equal to the length of the longest input list times 2
     #use list.count to see if the output labels vector of sample_seqs has equal numbers of true and false
     #check that it works in both the class0>class1 and class1>class0 case
     new_labels.count(True)
