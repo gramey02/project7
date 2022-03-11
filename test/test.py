@@ -5,8 +5,7 @@ import pytest
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 import numpy as np
-from nn import NeuralNetwork
-from preprocess import one_hot_encode_seqs, sample_seqs
+from nn import (nn,preprocess)
 
 # TODO: Write your test functions and associated docstrings below.
 
@@ -18,7 +17,7 @@ def test_forward():
     #create a neural network object and dummy data
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
-    nn = NeuralNetwork(nn_arch,
+    nn1 = nn.NeuralNetwork(nn_arch,
                       lr=0.01,
                       seed=42,
                       batch_size=15,
@@ -31,7 +30,7 @@ def test_forward():
     
     
     #check if the output is what is expected
-    output,cache = nn.forward(dummy)
+    output,cache = nn1.forward(dummy)
     expected = np.array([[0.48322134, 0.45455472],
                          [0.47916976, 0.43447566],
                          [0.47512091, 0.41460935],
@@ -61,7 +60,7 @@ def test_single_forward():
     #create a neural network object and dummy data
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
-    nn = NeuralNetwork(nn_arch,
+    nn1 = nn.NeuralNetwork(nn_arch,
                       lr=0.01,
                       seed=42,
                       batch_size=15,
@@ -74,12 +73,12 @@ def test_single_forward():
     
     #Get the inputs necessary for _single_forward
     layer_idx = 1
-    W1 = nn._param_dict['W' + str(layer_idx)]
-    b1 = nn._param_dict['b' + str(layer_idx)]
+    W1 = nn1._param_dict['W' + str(layer_idx)]
+    b1 = nn1._param_dict['b' + str(layer_idx)]
     activation = "relu"
     
     #check if A1 and Z1 are calculated correctly based on the output of _single_forward
-    A1,Z1 = nn._single_forward(W1, b1, dummy, activation)
+    A1,Z1 = nn1._single_forward(W1, b1, dummy, activation)
     
     #check if A1 and Z1 are the right shapes and are filled with the right values using np.allclose
     expectedA1 = np.array([[0.17993984, 0.4461183 , 0.        ],
@@ -104,7 +103,7 @@ def test_single_backprop():
     
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
-    nn = NeuralNetwork(nn_arch,
+    nn1 = nn.NeuralNetwork(nn_arch,
                       lr=0.01,
                       seed=42,
                       batch_size=15,
@@ -115,7 +114,7 @@ def test_single_backprop():
                     [5,6],
                     [7,8]])
 
-    y_hat, cache = nn.forward(dummy)
+    y_hat, cache = nn1.forward(dummy)
 
     dW1_expected = np.array([[16., 20.],
                              [16., 20.],
@@ -126,10 +125,10 @@ def test_single_backprop():
 
     last_layer = 0
     curr_layer = last_layer+1
-    param_dict = nn._param_dict
+    param_dict = nn1._param_dict
     layer = {'input_dim':2,'output_dim':3,'activation':'relu'}
 
-    dA_prev = nn._mean_squared_error_backprop(dummy, y_hat)
+    dA_prev = nn1._mean_squared_error_backprop(dummy, y_hat)
     dA_curr = dA_prev
 
     #get the inputs necessary for _single_backprop method
@@ -140,7 +139,7 @@ def test_single_backprop():
     b_curr = param_dict["b"+str(curr_layer)] #bias terms of the current layer
 
     #single backprop through current layer
-    dA_prev, dW_curr, db_curr = nn._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, curr_activation)
+    dA_prev, dW_curr, db_curr = nn1._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, curr_activation)
 
     #check that derivatives equal what they should
     assert np.allclose(db1_expected, db_curr)
@@ -168,7 +167,7 @@ def test_predict():
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
     
-    ae = NeuralNetwork(nn_arch,
+    ae = nn.NeuralNetwork(nn_arch,
                    lr = 1e-7,#0.0000001,
                    seed=42,
                    batch_size = 10,
@@ -233,7 +232,7 @@ def test_binary_cross_entropy():
     """
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
-    nn = NeuralNetwork(nn_arch,
+    nn1 = nn.NeuralNetwork(nn_arch,
                       lr=0.01,
                       seed=42,
                       batch_size=15,
@@ -245,7 +244,7 @@ def test_binary_cross_entropy():
     y_hat=np.array([[0.9],
                    [0.2]])
     
-    loss = nn._binary_cross_entropy(y,y_hat)
+    loss = nn1._binary_cross_entropy(y,y_hat)
     
     #check that is gives you a scalar and not a vector
     assert type(loss)==np.float64
@@ -260,7 +259,7 @@ def test_binary_cross_entropy_backprop():
     """
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
-    nn = NeuralNetwork(nn_arch,
+    nn1 = nn.NeuralNetwork(nn_arch,
                       lr=0.01,
                       seed=42,
                       batch_size=15,
@@ -272,7 +271,7 @@ def test_binary_cross_entropy_backprop():
     y_hat=np.array([[0.9],
                    [0.2]])
     
-    dA = nn._binary_cross_entropy_backprop(y,y_hat)
+    dA = nn1._binary_cross_entropy_backprop(y,y_hat)
     #check that it gives you a vector and not a scalar
     assert type(dA)==np.ndarray
     #check that the output equals what you want
@@ -284,7 +283,7 @@ def test_mean_squared_error():
     digits = load_digits().data
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
-    ae = NeuralNetwork(nn_arch,
+    ae = nn.NeuralNetwork(nn_arch,
                    lr = 1e-7,#0.0000001,
                    seed=42,
                    batch_size = 10,
@@ -314,7 +313,7 @@ def test_mean_squared_error_backprop():
     digits = load_digits().data
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
-    ae = NeuralNetwork(nn_arch,
+    ae = nn.NeuralNetwork(nn_arch,
                    lr = 1e-7,#0.0000001,
                    seed=42,
                    batch_size = 10,
@@ -359,7 +358,7 @@ def test_one_hot_encode():
     #create a dummy seq_arr
     seq_arr = ["ACTGATGCAT","AGAT", "TCGAGTC"]
     #get the one hot encodings
-    encodings = one_hot_encode_seqs(seq_arr)
+    encodings = preprocess.one_hot_encode_seqs(seq_arr)
     #assert that the encoding is 4x as long as the original sequence
     assert len(encodings[0])==4*len(seq_arr[0])
 
@@ -380,7 +379,7 @@ def test_sample_seqs():
     original_true_count = labels.count(True)
     original_false_count = labels.count(False)
 
-    new_seqs, new_labels = sample_seqs(seqs,labels)
+    new_seqs, new_labels = preprocess.sample_seqs(seqs,labels)
 
     #test that the amount of True and False sequences is equal
     assert new_labels.count(True)==new_labels.count(False)
@@ -396,7 +395,7 @@ def test_sample_seqs():
     labels = [True, False, False, False, False]
     original_true_count = labels.count(True)
     original_false_count = labels.count(False)
-    new_seqs, new_labels = sample_seqs(seqs,labels)
+    new_seqs, new_labels = preprocess.sample_seqs(seqs,labels)
 
     assert new_labels.count(True)==new_labels.count(False)
     assert new_seqs.count("ACTG")==4
