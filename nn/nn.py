@@ -316,6 +316,7 @@ class NeuralNetwork:
         iteration = 1
         
         while iteration < self._epochs:
+            print(iteration)
             #!!don't forget to expand the dimensions of the y_vectors prior to inputting them into the fit function!!
             #get number of dimensions in the X_train and y_train datasets
             dim_X_train = X_train.shape[1]
@@ -469,8 +470,10 @@ class NeuralNetwork:
         y = y.flatten()
         y_hat = y_hat.flatten()
         
+        #add a really small number to each y_hat values so there are no issues with taking the log of zero
+        y_hat = 0.00000001 + y_hat
         #calculate loss
-        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat))) #took away negative sign
+        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
         return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -488,6 +491,10 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
         m = len(y)
+        y=y.flatten()
+        y_hat=y_hat.flatten()
+        #add a really small number to y_hat values so there are no issues with dividing by zero
+        y_hat = 0.00000001 + y_hat
         return -(1/m)*(np.divide(y,y_hat) + np.divide(1-y,1-y_hat)) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat)))
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
