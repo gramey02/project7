@@ -4,11 +4,11 @@
 # Importing Dependencies
 import numpy as np
 from typing import List, Tuple
-from numpy.typing import ArrayLike
+#from numpy.typing import ArrayLike
 
 
 # Defining preprocessing functions
-def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
+def one_hot_encode_seqs(seq_arr): #: List[str]) -> ArrayLike:
     """
     This function generates a flattened one hot encoding of a list of nucleic acid sequences
     for use as input into a fully connected neural net.
