@@ -275,7 +275,7 @@ def test_binary_cross_entropy_backprop():
     #check that it gives you a vector and not a scalar
     assert type(dA)==np.ndarray
     #check that the output equals what you want
-    expected = np.array([0.55555556, 0.62499999])
+    expected = np.array([-0.55555556, -0.62499999])
     assert np.allclose(dA,expected)
 
 
@@ -363,7 +363,7 @@ def test_one_hot_encode():
     assert len(encodings[0])==4*len(seq_arr[0])
 
     seq_arr = ["AGA"]
-    encoded = one_hot_encode_seqs(seq_arr)
+    encoded = preprocess.one_hot_encode_seqs(seq_arr)
     expected = [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
     assert expected == list(encoded[0])
 
