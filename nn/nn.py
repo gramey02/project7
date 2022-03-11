@@ -4,7 +4,7 @@
 # Importing Dependencies
 import numpy as np
 from typing import List, Dict, Tuple, Union
-from numpy.typing import ArrayLike
+#from numpy.typing import ArrayLike
 
 
 # Neural Network Class Definition
@@ -51,7 +51,7 @@ class NeuralNetwork:
         # Initializing the parameter dictionary for use in training
         self._param_dict = self._init_params()
 
-    def _init_params(self) -> Dict[str, ArrayLike]:
+    def _init_params(self): #-> Dict[str, ArrayLike]:
         """
         DO NOT MODIFY THIS METHOD!! IT IS ALREADY COMPLETE!!
 
@@ -79,10 +79,10 @@ class NeuralNetwork:
         return param_dict
 
     def _single_forward(self,
-                        W_curr: ArrayLike,
-                        b_curr: ArrayLike,
-                        A_prev: ArrayLike,
-                        activation: str) -> Tuple[ArrayLike, ArrayLike]:
+                        W_curr,
+                        b_curr,
+                        A_prev,
+                        activation): #-> Tuple[ArrayLike, ArrayLike]:
         """
         This method is used for a single forward pass on a single layer.
 
@@ -116,7 +116,7 @@ class NeuralNetwork:
         
         return (A_curr, Z_curr)
 
-    def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
+    def forward(self, X):# -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
         """
         This method is responsible for one forward pass of the entire neural network.
 
@@ -159,12 +159,12 @@ class NeuralNetwork:
         return output,cache
 
     def _single_backprop(self,
-                         W_curr: ArrayLike,
-                         b_curr: ArrayLike,
-                         Z_curr: ArrayLike,
-                         A_prev: ArrayLike,
-                         dA_curr: ArrayLike,
-                         activation_curr: str) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+                         W_curr,
+                         b_curr,
+                         Z_curr,
+                         A_prev,
+                         dA_curr,
+                         activation_curr):# -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
         """
         This method is used for a single backprop pass on a single layer.
 
@@ -203,7 +203,7 @@ class NeuralNetwork:
         
         return dA_prev, dW_curr, db_curr
 
-    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
+    def backprop(self, y, y_hat, cache):
         """
         This method is responsible for the backprop of the whole fully connected neural network.
 
@@ -253,7 +253,7 @@ class NeuralNetwork:
         
         return grad_dict
 
-    def _update_params(self, grad_dict: Dict[str, ArrayLike]):
+    def _update_params(self, grad_dict):
         """
         This function updates the parameters in the neural network after backprop. This function
         only modifies internal attributes and thus does not return anything
@@ -287,10 +287,10 @@ class NeuralNetwork:
         return None
 
     def fit(self,
-            X_train: ArrayLike,
-            y_train: ArrayLike,
-            X_val: ArrayLike,
-            y_val: ArrayLike) -> Tuple[List[float], List[float]]:
+            X_train,
+            y_train,
+            X_val,
+            y_val):# -> Tuple[List[float], List[float]]:
         """
         This function trains the neural network via training for the number of epochs defined at
         the initialization of this class instance.
@@ -372,7 +372,7 @@ class NeuralNetwork:
         return per_epoch_loss_train, per_epoch_loss_val
         
 
-    def predict(self, X: ArrayLike) -> ArrayLike:
+    def predict(self, X):# -> ArrayLike:
         """
         This function returns the prediction of the neural network model.
 
@@ -388,7 +388,7 @@ class NeuralNetwork:
         
         return y_hat
 
-    def _sigmoid(self, Z: ArrayLike) -> ArrayLike:
+    def _sigmoid(self, Z):# -> ArrayLike:
         """
         Sigmoid activation function.
 
@@ -403,7 +403,7 @@ class NeuralNetwork:
         nl_transform = 1/(1+(1/np.exp(Z))) #sigmoid function, or 1/(1+e^-Z)
         return nl_transform
 
-    def _relu(self, Z: ArrayLike) -> ArrayLike:
+    def _relu(self, Z): #-> ArrayLike:
         """
         ReLU activation function.
 
@@ -418,7 +418,7 @@ class NeuralNetwork:
         nl_transform = np.maximum(0,Z) #this mimics the ReLu function which is 0 at x<0 and linearly increasing at x>0
         return nl_transform
 
-    def _sigmoid_backprop(self, dA: ArrayLike, Z: ArrayLike):
+    def _sigmoid_backprop(self, dA, Z):
         """
         Sigmoid derivative for backprop.
 
@@ -436,7 +436,7 @@ class NeuralNetwork:
         dZ = np.multiply(A,(1-A)) #should this actually be np.multiply? or dot product?
         return dZ
 
-    def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
+    def _relu_backprop(self, dA, Z):#(self, dA: ArrayLike, Z: ArrayLike):# -> ArrayLike:
         """
         ReLU derivative for backprop.
 
@@ -452,7 +452,7 @@ class NeuralNetwork:
         """
         return Z>0 #will return True if Z>0
 
-    def _binary_cross_entropy(self, y: ArrayLike, y_hat: ArrayLike) -> float:
+    def _binary_cross_entropy(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> float:
         """
         Binary cross entropy loss function.
 
@@ -477,7 +477,7 @@ class NeuralNetwork:
         loss = -(1/m)*np.sum(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
         return loss
 
-    def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
+    def _binary_cross_entropy_backprop(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> ArrayLike:
         """
         Binary cross entropy loss function derivative.
 
@@ -498,7 +498,7 @@ class NeuralNetwork:
         y_hat = y_hat - 0.00000001
         return -(1/m)*(np.divide(y,y_hat) + np.divide(1-y,1-y_hat)) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat))) #removed negative
 
-    def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
+    def _mean_squared_error(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> float:
         """
         Mean squared error loss.
 
@@ -515,7 +515,7 @@ class NeuralNetwork:
         loss = np.mean(np.square(y-y_hat))
         return loss
 
-    def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
+    def _mean_squared_error_backprop(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> ArrayLike:
         """
         Mean square error loss derivative.
 
@@ -533,7 +533,7 @@ class NeuralNetwork:
         dA = -2*(y-y_hat)*(1/m) #took away negative sign
         return dA
 
-    def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
+    def _loss_function(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> float:
         """
         Loss function, computes loss given y_hat and y. This function is
         here for the case where someone would want to write more loss
@@ -551,7 +551,7 @@ class NeuralNetwork:
         
         pass
 
-    def _loss_function_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
+    def _loss_function_backprop(self, y, y_hat):#(self, y: ArrayLike, y_hat: ArrayLike):# -> ArrayLike:
         """
         This function performs the derivative of the loss function with respect
         to the loss itself.
