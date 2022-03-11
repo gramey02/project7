@@ -469,11 +469,12 @@ class NeuralNetwork:
         #flatten input vectors, because they should be 1-dimensional
         y = y.flatten()
         y_hat = y_hat.flatten()
+        m = y.shape[0]
         
         #add a really small number to each y_hat values so there are no issues with taking the log of zero
         y_hat = y_hat - 0.00000001
         #calculate loss
-        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
+        loss = -(1/m)*np.sum(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat)))
         return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
