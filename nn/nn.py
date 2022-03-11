@@ -197,8 +197,8 @@ class NeuralNetwork:
         elif activation_curr=="relu":
             dZ_curr = (self._relu_backprop(dA_curr, Z_curr)).astype(float)        
         
-        dW_curr = np.dot(dZ_curr.T, A_prev) #/ m
-        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True)) #/ m
+        dW_curr = np.dot(dZ_curr.T, A_prev)
+        db_curr = np.transpose(np.sum(dZ_curr, axis=0, keepdims=True))
         dA_prev = np.dot(dZ_curr, W_curr)
         
         return dA_prev, dW_curr, db_curr
@@ -470,7 +470,7 @@ class NeuralNetwork:
         y_hat = y_hat.flatten()
         
         #calculate loss
-        loss = np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat))) #took away negative sign
+        loss = -np.mean(y.dot(np.log(y_hat)) + (1-y).dot(np.log(1-y_hat))) #took away negative sign
         return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -522,7 +522,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
         m = len(y)
-        dA = 2*(y-y_hat)*(1/m) #took away negative sign
+        dA = -2*(y-y_hat)*(1/m) #took away negative sign
         return dA
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
