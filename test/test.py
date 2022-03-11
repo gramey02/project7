@@ -227,13 +227,53 @@ def test_binary_cross_entropy():
     """
     Unit test for binary cross entropy function
     """
+    nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
+               {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
+    nn = NeuralNetwork(nn_arch,
+                      lr=0.01,
+                      seed=42,
+                      batch_size=15,
+                      epochs=100,
+                      loss_function = "mean squared error")
     
-    pass
+    y=np.array([[1],
+               [0]])
+    y_hat=np.array([[0.9],
+                   [0.2]])
+    
+    loss = nn._binary_cross_entropy(y,y_hat)
+    
+    #check that is gives you a scalar and not a vector
+    assert type(loss)==np.float64
+    #check that is gives you the right value
+    assert np.isclose(0.164252033486018, loss)
+    
 
 
 def test_binary_cross_entropy_backprop():
-    #check that it gives you a vector
-    pass
+    """
+    Unit test for binary cross entropy backprop method
+    """
+    nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
+               {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
+    nn = NeuralNetwork(nn_arch,
+                      lr=0.01,
+                      seed=42,
+                      batch_size=15,
+                      epochs=100,
+                      loss_function = "mean squared error")
+    
+    y=np.array([[1],
+               [0]])
+    y_hat=np.array([[0.9],
+                   [0.2]])
+    
+    dA = nn._binary_cross_entropy_backprop(y,y_hat)
+    #check that it gives you a vector and not a scalar
+    assert type(dA)==np.ndarray
+    #check that the output equals what you want
+    expected = np.array([0.55555556, 0.62499999])
+    assert np.allclose(dA,expected)
 
 
 def test_mean_squared_error():
@@ -264,8 +304,48 @@ def test_mean_squared_error():
 
 
 def test_mean_squared_error_backprop():
-    #check that it gives you a vector
-    pass
+    """
+    Unit test for mean squared error backprop method
+    """
+    digits = load_digits().data
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+               {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
+    ae = NeuralNetwork(nn_arch,
+                   lr = 1e-7,#0.0000001,
+                   seed=42,
+                   batch_size = 10,
+                   epochs=3000,
+                   loss_function = "mean squared error")
+    #create a held-out set
+    train_val, held_out = train_test_split(digits, test_size=0.1, random_state=42)
+    #use a 70/30 train/test split of the remaining data
+    X_train, X_val = train_test_split(train_val, test_size=0.3, random_state=42)
+    #train the model
+    per_epoch_loss_train, per_epoch_loss_val = ae.fit(X_train, X_train, X_val, X_val)
+    
+    #now that the weights have been updated, predict based on the held out set
+    y_hat = ae.predict(held_out)
+    
+    
+    #check that the output is a matrix and not a scalar
+    assert type(ae._mean_squared_error_backprop(held_out,y_hat))==np.ndarray
+    
+    #spot check the output
+    expected = np.array([ 0.04639598,  0.04971451,  0.03251216, -0.13333333, -0.07785973,
+        0.04698461, -0.        ,  0.14197694, -0.        ,  0.06508611,
+       -0.01761191, -0.07710611, -0.1597974 , -0.06136746,  0.04384745,
+        0.0143088 ,  0.05836084, -0.        ,  0.08377124, -0.13333333,
+       -0.17777778, -0.01180285,  0.04869832,  0.0577346 ,  0.08773753,
+        0.05760785,  0.04179342, -0.06666667, -0.07143059,  0.00230691,
+       -0.        ,  0.02308843,  0.07432725,  0.03402459,  0.01755972,
+       -0.01286552, -0.09293548,  0.00673269,  0.03875883,  0.05093344,
+        0.02506606,  0.04975003,  0.06938678, -0.08529206, -0.11764399,
+       -0.03333333, -0.        , -0.        , -0.        ,  0.05117917,
+        0.06532065, -0.14444444, -0.13313298,  0.01792185, -0.        ,
+       -0.        ,  0.06684129,  0.05525937, -0.        , -0.13631637,
+       -0.17777778, -0.12222222,  0.08160345, -0.        ])
+    
+    assert np.allclose((ae._mean_squared_error_backprop(held_out,y_hat))[10],expected)
 
 
 def test_one_hot_encode():
