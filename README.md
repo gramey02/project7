@@ -1,3 +1,5 @@
+![BuildStatus](https://github.com/gramey02/project7/workflows/project6/badge.svg?event=push)
+
 # Project 7
 Fully Connected Neural Network
 
