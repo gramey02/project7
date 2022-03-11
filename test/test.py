@@ -1,9 +1,12 @@
 # BMI 203 Project 7: Neural Network
 
 # Import necessary dependencies here
+import pytest
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 import numpy as np
+from nn import NeuralNetwork
+from preprocess import one_hot_encode_seqs, sample_seqs
 
 # TODO: Write your test functions and associated docstrings below.
 
