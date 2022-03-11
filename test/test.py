@@ -2,6 +2,7 @@
 
 # Import necessary dependencies here
 from sklearn.datasets import load_digits
+import numpy as np
 
 # TODO: Write your test functions and associated docstrings below.
 
@@ -255,9 +256,11 @@ def test_mean_squared_error():
     #now that the weights have been updated, predict based on the held out set
     y_hat = ae.predict(held_out)
     
-    #check that is gives you a scalar
-    #check that it gives you a scalar
-    pass
+    #check that mse function gives you a scalar even for two multi-dimensional inputs, and that the scalar is close to what is expected
+    assert type(ae._mean_squared_error(held_out, y_hat))==np.float64
+    assert np.isclose(ae._mean_squared_error(held_out, y_hat),21.899199329351575)
+    
+    
 
 
 def test_mean_squared_error_backprop():
