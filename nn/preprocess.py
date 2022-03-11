@@ -36,19 +36,21 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
     #iterate through list of sequences
     for seq in seq_arr:
         #create an empty list for each seq that will be filled with all of the letter encodings
-        seq_encoded = []
-
+        seq_encoded = np.empty((len(seq),4)) #empty numpy array []
+        
+        letter_counter = 0
         #go letter by letter storing the current letter's 1x4 list in the larger container list for the seq
         for letter in seq:
             current_encoding = d[letter] #get the encoding for the current letter
             #add to existing seq_encoded list with the newest letter's encoding
-            seq_encoded = seq_encoded + current_encoding
-
-        #flattened_seq = seq_encoded.flatten() #flatten the sequence's encodings into a single array entry
-        #convert the flattened seq to a list
-        encodings.append(seq_encoded) #append current seq's encoding to larger encodings list
+            seq_encoded[letter_counter] = current_encoding
+            letter_counter+=1
+        
+        seq_flattened = seq_encoded.flatten() #flatten the encoded letters into a single array
+            
+        encodings.append(seq_flattened) #append current seq's encoding to larger encodings list
     
-    return encodings
+    return np.array(encodings)
 
 
 def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[bool]]:
@@ -109,3 +111,31 @@ def sample_seqs(seqs: List[str],labels: List[bool]) -> Tuple[List[str], List[boo
         sampled_labels = labels
     
     return sampled_seqs, sampled_labels
+
+
+def correct_length(pos_seqs:List[str], neg_seqs:List[str]) -> List[str]:
+    """
+    This function reads in the much longer negative sequences and splits them up into chunks as big as the positive sequences
+    
+    Args:
+        pos_seqs: List[str]
+            List of all rap1 binding sites
+        neg_seqs: List[str]
+            List of sites that aren't bound by rap1
+
+    Returns:
+        negatives_split: List[str]
+            List of negative sequences split up into appropriate lengths
+    """
+    
+    correct_seq_length = len(pos_seqs[0]) #get desired length from first entry of positive sequences
+    negatives_split = []
+    
+    for seq in neg_seqs:
+        seq_split = []
+        for chunk in range(int(len(seq)/correct_seq_length)):
+            seq_split.append(seq[(chunk*correct_seq_length):((chunk+1)*correct_seq_length)])
+            
+        negatives_split = negatives_split + seq_split
+    
+    return negatives_split
