@@ -496,7 +496,7 @@ class NeuralNetwork:
         y_hat=y_hat.flatten()
         #add a really small number to y_hat values so there are no issues with dividing by zero
         y_hat = y_hat - 0.00000001
-        return (1/m)*(np.divide(y,y_hat) + np.divide(1-y,1-y_hat)) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat))) #removed negative
+        return -(1/m)*(np.divide(y,y_hat) + np.divide(1-y,1-y_hat)) #-np.mean((y/y_hat) + ((1-y)/(1-y_hat))) #removed negative
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
