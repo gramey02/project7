@@ -2,6 +2,7 @@
 
 # Import necessary dependencies here
 from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
 import numpy as np
 
 # TODO: Write your test functions and associated docstrings below.
@@ -298,7 +299,7 @@ def test_mean_squared_error():
     
     #check that mse function gives you a scalar even for two multi-dimensional inputs, and that the scalar is close to what is expected
     assert type(ae._mean_squared_error(held_out, y_hat))==np.float64
-    assert np.isclose(ae._mean_squared_error(held_out, y_hat),21.899199329351575)
+    assert np.isclose(ae._mean_squared_error(held_out, y_hat),43.79839865870315)
     
     
 
@@ -373,8 +374,8 @@ def test_sample_seqs():
     seqs = ["ACTG", "CTAG", "TGAC", "TAAC", "TGGA"]
     labels = [True, True, True, True, False]
 
-    original_true_count = new_labels.count(True)
-    original_false_count = new_labels.count(False)
+    original_true_count = labels.count(True)
+    original_false_count = labels.count(False)
 
     new_seqs, new_labels = sample_seqs(seqs,labels)
 
@@ -390,8 +391,8 @@ def test_sample_seqs():
     #test that sampling can work the other way around too, no matter which class is imbalanced
     seqs = ["ACTG", "CTAG", "TGAC", "TAAC", "TGGA"]
     labels = [True, False, False, False, False]
-    original_true_count = new_labels.count(True)
-    original_false_count = new_labels.count(False)
+    original_true_count = labels.count(True)
+    original_false_count = labels.count(False)
     new_seqs, new_labels = sample_seqs(seqs,labels)
 
     assert new_labels.count(True)==new_labels.count(False)
