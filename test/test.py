@@ -1,7 +1,7 @@
 # BMI 203 Project 7: Neural Network
 
 # Import necessary dependencies here
-
+from sklearn.datasets import load_digits
 
 # TODO: Write your test functions and associated docstrings below.
 
@@ -46,6 +46,8 @@ def test_forward():
     assert ('Z2' in cache)==True
     assert ('A5' in cache)==False
 
+    
+    
 
 def test_single_forward():
     """
@@ -88,13 +90,13 @@ def test_single_forward():
     assert np.allclose(expectedZ1, Z1)==True
 
 
+    
+    
 def test_single_backprop():
-
-    pass
-
-
-def test_predict():
-    #create a dummy neural network and dummy data
+    """
+    Unit test for backpropagation through a single layer of a neural network
+    """
+    
     nn_arch = [{'input_dim':2,'output_dim':3,'activation':'relu'},
                {'input_dim':3,'output_dim':2,'activation':'sigmoid'}]
     nn = NeuralNetwork(nn_arch,
@@ -107,25 +109,124 @@ def test_predict():
                     [3,4],
                     [5,6],
                     [7,8]])
+
+    y_hat, cache = nn.forward(dummy)
+
+    dW1_expected = np.array([[16., 20.],
+                             [16., 20.],
+                             [ 0.,  0.]])
+    db1_expected = np.array([[4.],
+                             [4.],
+                             [0.]])
+
+    last_layer = 0
+    curr_layer = last_layer+1
+    param_dict = nn._param_dict
+    layer = {'input_dim':2,'output_dim':3,'activation':'relu'}
+
+    dA_prev = nn._mean_squared_error_backprop(dummy, y_hat)
+    dA_curr = dA_prev
+
+    #get the inputs necessary for _single_backprop method
+    curr_activation = layer["activation"] #activation function of the current layer
+    A_prev = cache["A"+str(last_layer)] #inputs of the previous layer
+    Z_curr = cache["Z"+str(curr_layer)] #transformed inputs of the current layer
+    W_curr = param_dict["W"+str(curr_layer)] #weights of the current layer
+    b_curr = param_dict["b"+str(curr_layer)] #bias terms of the current layer
+
+    #single backprop through current layer
+    dA_prev, dW_curr, db_curr = nn._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, curr_activation)
+
+    #check that derivatives equal what they should
+    assert np.allclose(db1_expected, db_curr)
+    assert np.allclose(dW_curr, dW1_expected)
+
+    #check that dA_prev, dA_curr, and A_prev are all the same dimensions
+    assert dA_prev.shape==dA_curr.shape
+    assert dA_curr.shape==A_prev.shape
+    assert dA_curr.shape==dA_prev.shape
+
+    #same for dW_curr, W_curr and db_curr, b_curr
+    assert dW_curr.shape==W_curr.shape
+    assert db_curr.shape==b_curr.shape
     
-    #train the model on the dummy data
-    per_epoch_loss_train, per_epoch_loss_val = nn.fit(X_train, y_train, X_test, y_test)
-    #now that the weights have been updated, predict based on a held out set
-    y_hat,cache = nn.predict(held_out)
     
-    #assert that the observed and expected y_hat arrays are equal
-    expected_yhat = np.array()
-    comparison = expected_yhat==y_hat
-    arrays_are_equal=comparison.all()
-    assert arrays_are_equal==True
     
-    #assert that the accuracy is within a certain range
-    assert np.mean(y-y_hat)<###
-    assert np.mean(y-y_hat)>###
+
+def test_predict():
+    """
+    Unit test for the predict function
+    """
+    #use autoencoder to get some outputs to check
+    digits = load_digits().data
+    
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+               {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
+    
+    ae = NeuralNetwork(nn_arch,
+                   lr = 1e-7,#0.0000001,
+                   seed=42,
+                   batch_size = 10,
+                   epochs=3000,
+                   loss_function = "mean squared error")
+    #create a held-out set for future accuracy calculation
+    train_val, held_out = train_test_split(digits, test_size=0.1, random_state=42)
+    #use a 70/30 train/test split of the remaining data
+    X_train, X_val = train_test_split(train_val, test_size=0.3, random_state=42)
+    
+    #train the model
+    per_epoch_loss_train, per_epoch_loss_val = ae.fit(X_train, X_train, X_val, X_val)
+    
+    
+    #now that the weights have been updated, predict based on the held out set
+    y_hat = ae.predict(held_out)
+    
+    #spot check y_hat to make sure it was caculated correctly
+    y5_expected = np.array([ 2.6156432 ,  4.23995345,  4.87994946,  0.        ,  5.38035388,
+        8.06807737,  0.        ,  8.64782441,  0.16946276,  5.67471117,
+        3.04991667,  8.52799572,  3.96517504,  1.57155148,  4.22811623,
+        3.15698586,  5.45570063,  0.        ,  6.59736653,  0.        ,
+        0.        ,  8.70898651,  3.95407468,  5.96662173,  5.01333359,
+        6.87866524,  3.20624718,  0.        , 10.93008802,  7.13986826,
+        0.        ,  0.91371885,  6.11734777,  0.77879442,  0.60782059,
+        7.39628404,  7.46901678,  4.37257994,  4.57852723,  7.11095388,
+        2.57955955,  4.5859205 ,  6.53739168,  5.54173975,  6.86636608,
+        0.        ,  0.        ,  0.        ,  0.        ,  4.78575943,
+        4.41724675,  0.        ,  2.77665245,  3.57300446,  0.        ,
+        1.74362348,  6.08310471,  4.63253425,  0.        ,  2.50386765,
+        0.        ,  0.        ,  7.23852294,  0.        ])
+    
+    y29_expected = np.array([ 3.84997801,  3.19548952,  1.97788815,  0.        ,  6.85300661,
+       10.1092117 ,  0.        , 13.15127903,  1.39502083,  7.42629281,
+        6.94884123,  7.74237572,  4.10536826,  0.97183991,  3.37217776,
+        0.336039  ,  5.99783348,  0.        ,  7.67898466,  0.        ,
+        0.        ,  6.90031994,  3.88116713,  6.33716956,  4.88545874,
+        5.43475982,  3.70293359,  0.        , 10.1781509 ,  8.48304368,
+        0.        ,  0.30650027,  5.54485423,  2.86410505,  3.92793687,
+        9.73157899,  7.28636658,  4.46775585,  5.1328326 ,  7.59249288,
+        3.7407753 ,  2.52011064,  6.13836064,  4.06839628,  7.10802398,
+        0.        ,  0.        ,  0.        ,  0.        ,  4.19940942,
+        2.88414292,  0.        ,  6.62987895,  6.0187832 ,  0.        ,
+        5.03092313,  7.20403264,  3.19994329,  0.        ,  1.08682258,
+        0.        ,  0.        ,  8.39485858,  0.        ])
+
+    assert np.allclose(y_hat[5],y5_expected)==True
+    assert np.allclose(y_hat[29],y29_expected)==True
+    
+    #make sure that y_hat is the same size as the input, since this is an autoencoder case
+    assert held_out.shape==y_hat.shape
+    
+    #check that the predict output is equal to what the forward function would give you after training had occurred
+    forward_output, cache = ae.forward(held_out)
+    predict_output = ae.predict(held_out)
+    assert np.allclose(forward_output, predict_output)
 
 
 def test_binary_cross_entropy():
-    #check that is gives you a scalar
+    """
+    Unit test for binary cross entropy function
+    """
+    
     pass
 
 
@@ -135,6 +236,26 @@ def test_binary_cross_entropy_backprop():
 
 
 def test_mean_squared_error():
+    digits = load_digits().data
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+               {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}]
+    ae = NeuralNetwork(nn_arch,
+                   lr = 1e-7,#0.0000001,
+                   seed=42,
+                   batch_size = 10,
+                   epochs=3000,
+                   loss_function = "mean squared error")
+    #create a held-out set
+    train_val, held_out = train_test_split(digits, test_size=0.1, random_state=42)
+    #use a 70/30 train/test split of the remaining data
+    X_train, X_val = train_test_split(train_val, test_size=0.3, random_state=42)
+    #train the model
+    per_epoch_loss_train, per_epoch_loss_val = ae.fit(X_train, X_train, X_val, X_val)
+    
+    #now that the weights have been updated, predict based on the held out set
+    y_hat = ae.predict(held_out)
+    
+    #check that is gives you a scalar
     #check that it gives you a scalar
     pass
 
@@ -145,15 +266,20 @@ def test_mean_squared_error_backprop():
 
 
 def test_one_hot_encode():
+    """
+    Unit test for function that generates one hot encodings
+    """
     #create a dummy seq_arr
     seq_arr = ["ACTGATGCAT","AGAT", "TCGAGTC"]
     #get the one hot encodings
-    encodings = one_hot_encode_seq(seq_arr)
+    encodings = one_hot_encode_seqs(seq_arr)
     #assert that the encoding is 4x as long as the original sequence
     assert len(encodings[0])==4*len(seq_arr[0])
-    #assert that the third sequence was properly encoded, to spot-check
-    expected = [] #insert expected encoding
-    assert expected = encodings[2]
+
+    seq_arr = ["AGA"]
+    encoded = one_hot_encode_seqs(seq_arr)
+    expected = [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
+    assert expected == list(encoded[0])
 
 
 def test_sample_seqs():
