@@ -8,5 +8,5 @@ setup(
     author_email= 'Grace.Ramey@ucsf.edu',
     packages= find_packages(),
     description= 'Neural network class and data preprocessor',
-	install_requires= ['pytest', 'typing', 'numpy', 'scikit-learn', 'sklearn', 'numpy.typing']
+	install_requires= ['pytest', 'typing', 'numpy', 'scikit-learn', 'sklearn']
 )
